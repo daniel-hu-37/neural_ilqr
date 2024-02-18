@@ -14,18 +14,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 """Dynamics model."""
 
-import six
 import abc
-import theano
+import jax
+import jax.numpy as jnp
 import numpy as np
-import theano.tensor as T
 from scipy.optimize import approx_fprime
-from .autodiff import (as_function, batch_jacobian, hessian_vector,
+from ilqr.autodiff import (as_function, batch_jacobian, hessian_vector,
                        jacobian_vector)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Dynamics():
+class Dynamics(metaclass=abc.ABCMeta):
 
     """Dynamics Model."""
 

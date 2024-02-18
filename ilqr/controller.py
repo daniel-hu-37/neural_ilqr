@@ -14,14 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 """Controllers."""
 
-import six
 import abc
 import warnings
 import numpy as np
 
 
-@six.add_metaclass(abc.ABCMeta)
-class BaseController():
+class BaseController(metaclass=abc.ABCMeta):
 
     """Base trajectory optimizer controller."""
 

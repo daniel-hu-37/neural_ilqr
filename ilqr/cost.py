@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 """Instantaneous Cost Function."""
 
-import six
 import abc
 import numpy as np
 import theano.tensor as T
@@ -22,8 +21,7 @@ from scipy.optimize import approx_fprime
 from .autodiff import as_function, hessian_scalar, jacobian_scalar
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Cost():
+class Cost(metaclass=abc.ABCMeta):
 
     """Instantaneous Cost.
 
