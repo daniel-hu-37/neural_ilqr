@@ -14,25 +14,24 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 """Inverted pendulum example."""
 
-import numpy as np
-import theano.tensor as T
-from ..dynamics import BatchAutoDiffDynamics, tensor_constrain
+import jax.numpy as jnp
+from ilqr.dynamics import AutoDiffDynamics, apply_constraint
 
 
-class InvertedPendulumDynamics(BatchAutoDiffDynamics):
+class InvertedPendulumDynamics(AutoDiffDynamics):
 
-    """Inverted pendulum auto-differentiated dynamics model."""
+  """Inverted pendulum auto-differentiated dynamics model."""
 
-    def __init__(self,
-                 dt,
-                 constrain=True,
-                 min_bounds=-1.0,
-                 max_bounds=1.0,
-                 m=1.0,
-                 l=1.0,
-                 g=9.80665,
-                 **kwargs):
-        """Constructs an InvertedPendulumDynamics model.
+  def __init__(self,
+               dt,
+               constrain=True,
+               min_bounds=-1.0,
+               max_bounds=1.0,
+               m=1.0,
+               l=1.0,
+               g=9.80665,
+               **kwargs):
+    """Constructs an InvertedPendulumDynamics model.
 
         Args:
             dt: Time step [s].
@@ -43,50 +42,50 @@ class InvertedPendulumDynamics(BatchAutoDiffDynamics):
             l: Pendulum length [m].
             g: Gravity acceleration [m/s^2].
             **kwargs: Additional key-word arguments to pass to the
-                BatchAutoDiffDynamics constructor.
+                AutoDiffDynamics constructor.
 
         Note:
             state: [sin(theta), cos(theta), theta']
             action: [torque]
             theta: 0 is pointing up and increasing counter-clockwise.
         """
-        self.constrained = constrain
-        self.min_bounds = min_bounds
-        self.max_bounds = max_bounds
+    self.constrained = constrain
+    self.min_bounds = min_bounds
+    self.max_bounds = max_bounds
 
-        def f(x, u, i):
-            # Constrain action space.
-            if constrain:
-                u = tensor_constrain(u, min_bounds, max_bounds)
+    def f(x, u, i):
+      # Constrain action space.
+      if constrain:
+        u = apply_constraint(u, min_bounds, max_bounds, np=jnp)
 
-            sin_theta = x[..., 0]
-            cos_theta = x[..., 1]
-            theta_dot = x[..., 2]
-            torque = u[..., 0]
+      sin_theta = x[0]
+      cos_theta = x[1]
+      theta_dot = x[2]
+      torque = u[0]
 
-            # Deal with angle wrap-around.
-            theta = T.arctan2(sin_theta, cos_theta)
+      # Deal with angle wrap-around.
+      theta = jnp.arctan2(sin_theta, cos_theta)
 
-            # Define acceleration.
-            theta_dot_dot = -3.0 * g / (2 * l) * T.sin(theta + np.pi)
-            theta_dot_dot += 3.0 / (m * l**2) * torque
+      # Define acceleration.
+      theta_dot_dot = -3.0 * g / (2 * l) * jnp.sin(theta + jnp.pi)
+      theta_dot_dot += 3.0 / (m * l**2) * torque
 
-            next_theta = theta + theta_dot * dt
+      next_theta = theta + theta_dot * dt
 
-            return T.stack([
-                T.sin(next_theta),
-                T.cos(next_theta),
-                theta_dot + theta_dot_dot * dt,
-            ]).T
+      return jnp.stack([
+          jnp.sin(next_theta),
+          jnp.cos(next_theta),
+          theta_dot + theta_dot_dot * dt,
+      ]).T
 
-        super(InvertedPendulumDynamics, self).__init__(f,
-                                                       state_size=3,
-                                                       action_size=1,
-                                                       **kwargs)
+    super(InvertedPendulumDynamics, self).__init__(f,
+                                                   state_size=3,
+                                                   action_size=1,
+                                                   **kwargs)
 
-    @classmethod
-    def augment_state(cls, state):
-        """Augments angular state into a non-angular state by replacing theta
+  @classmethod
+  def augment_state(cls, state):
+    """Augments angular state into a non-angular state by replacing theta
         with sin(theta) and cos(theta).
 
         In this case, it converts:
@@ -99,17 +98,17 @@ class InvertedPendulumDynamics(BatchAutoDiffDynamics):
         Returns:
             Augmented state size [state_size].
         """
-        if state.ndim == 1:
-            theta, theta_dot = state
-        else:
-            theta = state[..., 0].reshape(-1, 1)
-            theta_dot = state[..., 1].reshape(-1, 1)
+    if state.ndim == 1:
+      theta, theta_dot = state
+    else:
+      theta = state[0].reshape(-1, 1)
+      theta_dot = state[1].reshape(-1, 1)
 
-        return np.hstack([np.sin(theta), np.cos(theta), theta_dot])
+    return jnp.hstack([jnp.sin(theta), jnp.cos(theta), theta_dot])
 
-    @classmethod
-    def reduce_state(cls, state):
-        """Reduces a non-angular state into an angular state by replacing
+  @classmethod
+  def reduce_state(cls, state):
+    """Reduces a non-angular state into an angular state by replacing
         sin(theta) and cos(theta) with theta.
 
         In this case, it converts:
@@ -122,12 +121,12 @@ class InvertedPendulumDynamics(BatchAutoDiffDynamics):
         Returns:
             Reduced state size [reducted_state_size].
         """
-        if state.ndim == 1:
-            sin_theta, cos_theta, theta_dot = state
-        else:
-            sin_theta = state[..., 0].reshape(-1, 1)
-            cos_theta = state[..., 1].reshape(-1, 1)
-            theta_dot = state[..., 2].reshape(-1, 1)
+    if state.ndim == 1:
+      sin_theta, cos_theta, theta_dot = state
+    else:
+      sin_theta = state[0].reshape(-1, 1)
+      cos_theta = state[1].reshape(-1, 1)
+      theta_dot = state[2].reshape(-1, 1)
 
-        theta = np.arctan2(sin_theta, cos_theta)
-        return np.hstack([theta, theta_dot])
+    theta = jnp.arctan2(sin_theta, cos_theta)
+    return jnp.hstack([theta, theta_dot])

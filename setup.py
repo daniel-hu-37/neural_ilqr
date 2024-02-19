@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 
 def read(fname):
-    """Reads a file's contents as a string.
+  """Reads a file's contents as a string.
 
     Args:
         fname: Filename.
@@ -14,7 +14,7 @@ def read(fname):
     Returns:
         File's contents.
     """
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+  return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
 BASE_URL = "https://github.com/anassinator/ilqr"
