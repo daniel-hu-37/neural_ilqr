@@ -16,7 +16,7 @@
 
 import abc
 
-from jax import jacobian
+from jax import grad, jacobian
 import jax.numpy as jnp
 import numpy as np
 
@@ -194,9 +194,9 @@ class AutoDiffCost(Cost):
             dl/dx [state_size].
         """
     if terminal:
-      return jacobian(self._l_terminal, 0)(x, u, i)
+      return grad(self._l_terminal, 0)(x, u, i)
 
-    return jacobian(self._l, 0)(x, u, i)
+    return grad(self._l, 0)(x, u, i)
 
   def l_u(self, x, u, i, terminal=False):
     """Partial derivative of cost function with respect to u.
@@ -214,7 +214,7 @@ class AutoDiffCost(Cost):
       # Not a function of u, so the derivative is zero.
       return jnp.zeros(self.dim_control)
 
-    return jacobian(self._l, 1)(x, u, i)
+    return grad(self._l, 1)(x, u, i)
 
   def l_xx(self, x, u, i, terminal=False):
     """Second partial derivative of cost function with respect to x.

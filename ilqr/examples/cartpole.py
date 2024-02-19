@@ -93,8 +93,8 @@ class CartpoleDynamics(AutoDiffDynamics):
       ]).T
 
     super(CartpoleDynamics, self).__init__(f,
-                                           state_size=5,
-                                           action_size=1,
+                                           dim_state=5,
+                                           dim_control=1,
                                            **kwargs)
 
   @classmethod

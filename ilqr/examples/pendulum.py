@@ -79,8 +79,8 @@ class InvertedPendulumDynamics(AutoDiffDynamics):
       ]).T
 
     super(InvertedPendulumDynamics, self).__init__(f,
-                                                   state_size=3,
-                                                   action_size=1,
+                                                   dim_state=3,
+                                                   dim_control=1,
                                                    **kwargs)
 
   @classmethod

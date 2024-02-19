@@ -17,7 +17,6 @@
 import abc
 
 from jax import jacobian
-import jax.numpy as jnp
 import numpy as np
 
 
@@ -202,51 +201,6 @@ class AutoDiffDynamics(Dynamics):
             df/du [state_size, action_size].
         """
     return jacobian(self._f, 1)(x, u)
-
-  def f_xx(self, x, u):
-    """Second partial derivative of dynamics model with respect to x.
-
-        Args:
-            x: Current state [state_size].
-            u: Current control [action_size].
-
-        Returns:
-            d^2f/dx^2 [state_size, state_size, state_size].
-        """
-    if not self._has_hessians:
-      raise NotImplementedError
-
-    return jacobian(self.f_x, 0)(x, u)
-
-  def f_ux(self, x, u):
-    """Second partial derivative of dynamics model with respect to u and x.
-
-        Args:
-            x: Current state [state_size].
-            u: Current control [action_size].
-
-        Returns:
-            d^2f/dudx [state_size, action_size, state_size].
-        """
-    if not self._has_hessians:
-      raise NotImplementedError
-
-    return jacobian(self.f_u, 0)(x, u)
-
-  def f_uu(self, x, u):
-    """Second partial derivative of dynamics model with respect to u.
-
-        Args:
-            x: Current state [state_size].
-            u: Current control [action_size].
-
-        Returns:
-            d^2f/du^2 [state_size, action_size, action_size].
-        """
-    if not self._has_hessians:
-      raise NotImplementedError
-
-    return jacobian(self.f_u, 1)(x, u)
 
 
 def apply_constraint(u, min_bounds, max_bounds, np=np):
