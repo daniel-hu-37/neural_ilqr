@@ -79,57 +79,6 @@ class Dynamics(metaclass=abc.ABCMeta):
         """
     raise NotImplementedError
 
-  @abc.abstractmethod
-  def f_xx(self, x, u):
-    """Second partial derivative of dynamics model with respect to x.
-
-        Note:
-            This is not necessary to implement if you're planning on skipping
-            Hessian evaluation as the iLQR implementation does by default.
-
-        Args:
-            x: Current state [state_size].
-            u: Current control [action_size].
-
-        Returns:
-            d^2f/dx^2 [state_size, state_size, state_size].
-        """
-    raise NotImplementedError
-
-  @abc.abstractmethod
-  def f_ux(self, x, u):
-    """Second partial derivative of dynamics model with respect to u and x.
-
-        Note:
-            This is not necessary to implement if you're planning on skipping
-            Hessian evaluation as the iLQR implementation does by default.
-
-        Args:
-            x: Current state [state_size].
-            u: Current control [action_size].
-
-        Returns:
-            d^2f/dudx [state_size, action_size, state_size].
-        """
-    raise NotImplementedError
-
-  @abc.abstractmethod
-  def f_uu(self, x, u):
-    """Second partial derivative of dynamics model with respect to u.
-
-        Note:
-            This is not necessary to implement if you're planning on skipping
-            Hessian evaluation as the iLQR implementation does by default.
-
-        Args:
-            x: Current state [state_size].
-            u: Current control [action_size].
-
-        Returns:
-            d^2f/du^2 [state_size, action_size, action_size].
-        """
-    raise NotImplementedError
-
 
 class AutoDiffDynamics(Dynamics):
 

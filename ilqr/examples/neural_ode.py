@@ -47,7 +47,7 @@ class NeuralODE(AutoDiffDynamics):
       dx_dt = jnp.dot(dx_dt, w3) + b3
       return dx_dt
 
-    def f(x, u, i):
+    def f(x, u):
       # Constrain action space.
       if constrain:
         u = apply_constraint(u, min_bounds, max_bounds, np=jnp)

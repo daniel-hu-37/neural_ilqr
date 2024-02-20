@@ -35,7 +35,7 @@ class MultiLayerPerceptron(AutoDiffDynamics):
     w3 = jnp.zeros((512, dim_state))
     b3 = jnp.zeros(dim_state)
 
-    def f(x, u, i):
+    def f(x, u):
       # Constrain action space.
       if constrain:
         u = apply_constraint(u, min_bounds, max_bounds, np=jnp)

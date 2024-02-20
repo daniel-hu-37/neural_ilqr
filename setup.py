@@ -19,10 +19,7 @@ def read(fname):
 
 BASE_URL = "https://github.com/anassinator/ilqr"
 INSTALL_REQUIRES = [
-    "numpy>=1.16.3",
-    "scipy>=1.2.1",
-    "six>=1.12.0",
-    "Theano>=1.0.4",
+    "numpy>=1.16.3", "scipy>=1.2.1", "jax>=0.2.17", "jaxlib>=0.1.71"
 ]
 
 # Parse version information.

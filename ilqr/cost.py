@@ -274,6 +274,14 @@ class QRCost(Cost):
 
   """Quadratic Regulator Instantaneous Cost."""
 
+  @property
+  def dim_state(self):
+    return self.Q.shape[0]
+
+  @property
+  def dim_control(self):
+    return self.R.shape[0]
+
   def __init__(self, Q, R, Q_terminal=None, x_goal=None, u_goal=None):
     """Constructs a QRCost.
 
@@ -422,6 +430,14 @@ class QRCost(Cost):
 class PathQRCost(Cost):
 
   """Quadratic Regulator Instantaneous Cost for trajectory following."""
+
+  @property
+  def dim_state(self):
+    return self.Q.shape[0]
+
+  @property
+  def dim_control(self):
+    return self.R.shape[0]
 
   def __init__(self, Q, R, x_path, u_path=None, Q_terminal=None):
     """Constructs a QRCost.

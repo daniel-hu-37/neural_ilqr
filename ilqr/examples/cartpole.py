@@ -55,7 +55,7 @@ class CartpoleDynamics(AutoDiffDynamics):
     self.min_bounds = min_bounds
     self.max_bounds = max_bounds
 
-    def f(x, u, i):
+    def f(x, u):
       # Constrain action space.
       if constrain:
         u = apply_constraint(u, min_bounds, max_bounds, np=jnp)
