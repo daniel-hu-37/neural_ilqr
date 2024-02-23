@@ -16,7 +16,7 @@
 
 import abc
 
-from jax import jacobian
+import jax
 import numpy as np
 
 
@@ -127,6 +127,7 @@ class AutoDiffDynamics(Dynamics):
         """
     return self._f(x, u)
 
+  @jax.jit
   def f_x(self, x, u):
     """Partial derivative of dynamics model with respect to x.
 
@@ -137,8 +138,9 @@ class AutoDiffDynamics(Dynamics):
         Returns:
             df/dx [state_size, state_size].
         """
-    return jacobian(self._f, 0)(x, u)
+    return jax.jacobian(self._f, 0)(x, u)
 
+  @jax.jit
   def f_u(self, x, u):
     """Partial derivative of dynamics model with respect to u.
 
@@ -149,9 +151,10 @@ class AutoDiffDynamics(Dynamics):
         Returns:
             df/du [state_size, action_size].
         """
-    return jacobian(self._f, 1)(x, u)
+    return jax.jacobian(self._f, 1)(x, u)
 
 
+@jax.jit
 def apply_constraint(u, min_bounds, max_bounds, np=np):
   """Constrains a control vector between given bounds through a squashing
     function.
