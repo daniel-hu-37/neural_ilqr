@@ -7,14 +7,9 @@ class NeuralNetwork(metaclass=abc.ABCMeta):
 
   """Base class for neural network."""
 
-  @property
-  def param(self):
-    """Returns neural network params."""
-    return self._params
-
   def __init__(self):
     self.step_size = 0.001
-    self._params = None
+    self.params = None
 
   @abc.abstractmethod
   def predict(self, inputs, params=None):

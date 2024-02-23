@@ -10,7 +10,14 @@ class NeuralODE(nn.NeuralNetwork):
 
   """Cartpole auto-differentiated dynamics model."""
 
-  def __init__(self, dim_state, dim_control, dt, **kwargs):
+  @classmethod
+  def from_prob(cls, dim_state, dim_control, dt):
+    """Creates MLP from prob."""
+    layer_sizes = [dim_state + dim_control, 1024, 512, dim_state]
+    params = utils.init_random_params(_DEFAULT_PARAM_SCALE, layer_sizes)
+    return cls(dim_state, dim_control, params, dt)
+
+  def __init__(self, dim_state, dim_control, params, dt, **kwargs):
     """Cartpole dynamics.
 
         Args:
@@ -24,17 +31,13 @@ class NeuralODE(nn.NeuralNetwork):
         """
     self.dim_state = dim_state
     self.dim_control = dim_control
-
-    self._dt = dt
-
-    layer_sizes = [dim_state + dim_control, 1024, 512, dim_state]
-    self._params = utils.init_random_params(_DEFAULT_PARAM_SCALE, layer_sizes)
-
+    self.params = params
+    self.dt = dt
     super().__init__()
 
   def predict(self, inputs, params=None):
     """Predicts neural network output."""
-    params = self._params if params is None else params
+    params = self.params if params is None else params
 
     def forward(inputs):
       """Computes dynamics."""
@@ -44,7 +47,7 @@ class NeuralODE(nn.NeuralNetwork):
         activations = jnp.tanh(outputs)
       return activations
 
-    return ode.odeint(forward, inputs, self._dt)
+    return ode.odeint(forward, inputs, self.dt)
 
   def loss(self, batch, params=None):
     """Computes loss."""
