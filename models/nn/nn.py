@@ -1,4 +1,5 @@
 import abc
+from functools import partial
 
 import jax
 
@@ -19,12 +20,12 @@ class NeuralNetwork(metaclass=abc.ABCMeta):
   def loss(self, batch, params=None):
     """Computes loss."""
 
-  @jax.jit
+  @partial(jax.jit, static_argnums=0)
   def grad(self, batch, params=None):
     """Computes gradient."""
     return jax.grad(self.loss)(batch, params)
 
-  @jax.jit
+  @partial(jax.jit, static_argnums=0)
   def update(self, batch, params=None):
     """Updates neural network with batch."""
     grads = self.grad(batch, params)

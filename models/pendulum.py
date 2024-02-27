@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 """Inverted pendulum example."""
-
+import jax
 import jax.numpy as jnp
 from ilqr.dynamics import AutoDiffDynamics, apply_constraint
 
@@ -53,6 +53,7 @@ class InvertedPendulumDynamics(AutoDiffDynamics):
     self.min_bounds = min_bounds
     self.max_bounds = max_bounds
 
+    @jax.jit
     def f(x, u):
       # Constrain action space.
       if constrain:

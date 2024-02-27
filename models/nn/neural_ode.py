@@ -1,3 +1,6 @@
+from functools import partial
+
+import jax
 from jax.experimental import ode
 import jax.numpy as jnp
 
@@ -35,6 +38,7 @@ class NeuralODE(nn.NeuralNetwork):
     self.dt = dt
     super().__init__()
 
+  @partial(jax.jit, static_argnums=0)
   def predict(self, inputs, params=None):
     """Predicts neural network output."""
     params = self.params if params is None else params
@@ -49,6 +53,7 @@ class NeuralODE(nn.NeuralNetwork):
 
     return ode.odeint(forward, inputs, self.dt)
 
+  @partial(jax.jit, static_argnums=0)
   def loss(self, batch, params=None):
     """Computes loss."""
     inputs, targets = batch

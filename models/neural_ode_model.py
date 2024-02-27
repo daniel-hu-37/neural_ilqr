@@ -1,4 +1,6 @@
+import jax
 import jax.numpy as jnp
+
 from ilqr.dynamics import AutoDiffDynamics, apply_constraint
 from models.nn import neural_ode
 
@@ -29,6 +31,7 @@ class NeuralODEModel(AutoDiffDynamics):
         """
     self.model = neural_ode.NeuralODE(dim_state, dim_control, dt, **kwargs)
 
+    @jax.jit
     def f(x, u):
       # Constrain action space.
       if constrain:

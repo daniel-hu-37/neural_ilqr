@@ -1,3 +1,6 @@
+from functools import partial
+
+import jax
 import jax.numpy as jnp
 
 from nn import nn, utils
@@ -33,6 +36,7 @@ class MultiLayerPerceptron(nn.NeuralNetwork):
     self.params = params
     super().__init__()
 
+  @partial(jax.jit, static_argnums=0)
   def predict(self, inputs, params=None):
     """Predicts neural network output."""
     params = self.params if params is None else params
@@ -42,6 +46,7 @@ class MultiLayerPerceptron(nn.NeuralNetwork):
       activations = jnp.tanh(outputs)
     return activations
 
+  @partial(jax.jit, static_argnums=0)
   def loss(self, batch, params=None):
     """Computes loss."""
     inputs, targets = batch

@@ -1,3 +1,4 @@
+import jax
 import jax.numpy as jnp
 
 from ilqr.dynamics import AutoDiffDynamics, apply_constraint
@@ -30,6 +31,7 @@ class MlpModel(AutoDiffDynamics):
         """
     self.model = mlp.MultiLayerPerceptron(dim_state, dim_control, **kwargs)
 
+    @jax.jit
     def f(x, u):
       # Constrain action space.
       if constrain:
