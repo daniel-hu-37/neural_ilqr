@@ -33,10 +33,6 @@ class NeuralODEModel(AutoDiffDynamics):
 
     @jax.jit
     def f(x, u):
-      # Constrain action space.
-      if constrain:
-        u = apply_constraint(u, min_bounds, max_bounds, np=jnp)
-
       x_bar = jnp.hstack(x, u)
       x_bar = self.model.predict(x_bar)
 

@@ -55,10 +55,6 @@ class InvertedPendulumDynamics(AutoDiffDynamics):
 
     @jax.jit
     def f(x, u):
-      # Constrain action space.
-      if constrain:
-        u = apply_constraint(u, min_bounds, max_bounds, np=jnp)
-
       sin_theta = x[0]
       cos_theta = x[1]
       theta_dot = x[2]

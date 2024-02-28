@@ -57,10 +57,6 @@ class CartpoleDynamics(AutoDiffDynamics):
 
     @jax.jit
     def f(x, u):
-      # Constrain action space.
-      if constrain:
-        u = apply_constraint(u, min_bounds, max_bounds, np=jnp)
-
       x_ = x[0]
       x_dot = x[1]
       sin_theta = x[2]
