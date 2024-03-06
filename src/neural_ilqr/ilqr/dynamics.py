@@ -24,24 +24,9 @@ class Dynamics(metaclass=abc.ABCMeta):
 
   """Dynamics Model."""
 
-  @property
+  @classmethod
   @abc.abstractmethod
-  def dim_state(self):
-    raise NotImplementedError
-
-  @property
-  @abc.abstractmethod
-  def dim_control(self):
-    raise NotImplementedError
-
-  @property
-  @abc.abstractmethod
-  def has_hessians(self):
-    """Whether the second order derivatives are available."""
-    raise NotImplementedError
-
-  @abc.abstractmethod
-  def f(self, x, u):
+  def f(cls, x, u, params):
     """Dynamics model.
 
         Args:
@@ -53,8 +38,9 @@ class Dynamics(metaclass=abc.ABCMeta):
         """
     raise NotImplementedError
 
+  @classmethod
   @abc.abstractmethod
-  def f_x(self, x, u):
+  def f_x(cls, x, u, params):
     """Partial derivative of dynamics model with respect to x.
 
         Args:
@@ -66,8 +52,9 @@ class Dynamics(metaclass=abc.ABCMeta):
         """
     raise NotImplementedError
 
+  @classmethod
   @abc.abstractmethod
-  def f_u(self, x, u):
+  def f_u(cls, x, u, params):
     """Partial derivative of dynamics model with respect to u.
 
         Args:
@@ -80,11 +67,15 @@ class Dynamics(metaclass=abc.ABCMeta):
     raise NotImplementedError
 
 
-class AutoDiffDynamics(Dynamics):
+class AutoDiffDynamics(metaclass=abc.ABCMeta):
 
   """Auto-differentiated Dynamics Model."""
 
-  def __init__(self, f, dim_state, dim_control, hessians=False, **kwargs):
+  def __init_subclass__(cls, f, **kwargs) -> None:
+    super().__init_subclass__(**kwargs)
+    cls.f = f
+
+  def __init__(self, dim_state, dim_control, **kwargs):
     """Constructs an AutoDiffDynamics model.
 
         Args:
@@ -95,78 +86,5 @@ class AutoDiffDynamics(Dynamics):
             **kwargs: Additional keyword-arguments to pass to
                 `theano.function()`.
         """
-    self._f = f
-    self._dim_state = dim_state
-    self._dim_control = dim_control
-    self._has_hessians = hessians
-
-    super(AutoDiffDynamics, self).__init__()
-
-  @property
-  def dim_state(self):
-    return self._dim_state
-
-  @property
-  def dim_control(self):
-    return self._dim_control
-
-  @property
-  def has_hessians(self):
-    """Whether the second order derivatives are available."""
-    return self._has_hessians
-
-  def f(self, x, u):
-    """Dynamics model.
-
-        Args:
-            x: Current state [state_size].
-            u: Current control [action_size].
-
-        Returns:
-            Next state [state_size].
-        """
-    return self._f(x, u)
-
-  @jax.jit
-  def f_x(self, x, u):
-    """Partial derivative of dynamics model with respect to x.
-
-        Args:
-            x: Current state [state_size].
-            u: Current control [action_size].
-
-        Returns:
-            df/dx [state_size, state_size].
-        """
-    return jax.jacobian(self._f, 0)(x, u)
-
-  @jax.jit
-  def f_u(self, x, u):
-    """Partial derivative of dynamics model with respect to u.
-
-        Args:
-            x: Current state [state_size].
-            u: Current control [action_size].
-
-        Returns:
-            df/du [state_size, action_size].
-        """
-    return jax.jacobian(self._f, 1)(x, u)
-
-
-@jax.jit
-def apply_constraint(u, min_bounds, max_bounds, np=np):
-  """Constrains a control vector between given bounds through a squashing
-    function.
-
-    Args:
-        u: Control vector [action_size].
-        min_bounds: Minimum control bounds [action_size].
-        max_bounds: Maximum control bounds [action_size].
-
-    Returns:
-        Constrained control vector [action_size].
-    """
-  diff = (max_bounds - min_bounds) / 2.0
-  mean = (max_bounds + min_bounds) / 2.0
-  return diff * np.tanh(u) + mean
+    self.dim_state = dim_state
+    self.dim_control = dim_control
