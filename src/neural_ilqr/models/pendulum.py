@@ -15,7 +15,7 @@
 """Inverted pendulum example."""
 import jax
 import jax.numpy as jnp
-from ilqr.dynamics import AutoDiffDynamics, apply_constraint
+from neural_ilqr.ilqr.dynamics import AutoDiffDynamics, apply_constraint
 
 
 class InvertedPendulumDynamics(AutoDiffDynamics):
