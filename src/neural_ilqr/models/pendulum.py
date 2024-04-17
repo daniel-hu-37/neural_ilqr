@@ -15,23 +15,24 @@
 """Inverted pendulum example."""
 import jax
 import jax.numpy as jnp
-from neural_ilqr.ilqr.dynamics import AutoDiffDynamics, apply_constraint
+from neural_ilqr.ilqr.dynamics import AutoDiffDynamics
 
 
 class InvertedPendulumDynamics(AutoDiffDynamics):
+    """Inverted pendulum auto-differentiated dynamics model."""
 
-  """Inverted pendulum auto-differentiated dynamics model."""
-
-  def __init__(self,
-               dt,
-               constrain=True,
-               min_bounds=-1.0,
-               max_bounds=1.0,
-               m=1.0,
-               l=1.0,
-               g=9.80665,
-               **kwargs):
-    """Constructs an InvertedPendulumDynamics model.
+    def __init__(
+        self,
+        dt,
+        constrain=True,
+        min_bounds=-1.0,
+        max_bounds=1.0,
+        m=1.0,
+        l=1.0,
+        g=9.80665,
+        **kwargs
+    ):
+        """Constructs an InvertedPendulumDynamics model.
 
         Args:
             dt: Time step [s].
@@ -49,40 +50,41 @@ class InvertedPendulumDynamics(AutoDiffDynamics):
             action: [torque]
             theta: 0 is pointing up and increasing counter-clockwise.
         """
-    self.constrained = constrain
-    self.min_bounds = min_bounds
-    self.max_bounds = max_bounds
+        self.constrained = constrain
+        self.min_bounds = min_bounds
+        self.max_bounds = max_bounds
 
-    @jax.jit
-    def f(x, u):
-      sin_theta = x[0]
-      cos_theta = x[1]
-      theta_dot = x[2]
-      torque = u[0]
+        @jax.jit
+        def f(x, u):
+            sin_theta = x[0]
+            cos_theta = x[1]
+            theta_dot = x[2]
+            torque = u[0]
 
-      # Deal with angle wrap-around.
-      theta = jnp.arctan2(sin_theta, cos_theta)
+            # Deal with angle wrap-around.
+            theta = jnp.arctan2(sin_theta, cos_theta)
 
-      # Define acceleration.
-      theta_dot_dot = -3.0 * g / (2 * l) * jnp.sin(theta + jnp.pi)
-      theta_dot_dot += 3.0 / (m * l**2) * torque
+            # Define acceleration.
+            theta_dot_dot = -3.0 * g / (2 * l) * jnp.sin(theta + jnp.pi)
+            theta_dot_dot += 3.0 / (m * l**2) * torque
 
-      next_theta = theta + theta_dot * dt
+            next_theta = theta + theta_dot * dt
 
-      return jnp.stack([
-          jnp.sin(next_theta),
-          jnp.cos(next_theta),
-          theta_dot + theta_dot_dot * dt,
-      ]).T
+            return jnp.stack(
+                [
+                    jnp.sin(next_theta),
+                    jnp.cos(next_theta),
+                    theta_dot + theta_dot_dot * dt,
+                ]
+            ).T
 
-    super(InvertedPendulumDynamics, self).__init__(f,
-                                                   dim_state=3,
-                                                   dim_control=1,
-                                                   **kwargs)
+        super(InvertedPendulumDynamics, self).__init__(
+            f, dim_state=3, dim_control=1, **kwargs
+        )
 
-  @classmethod
-  def augment_state(cls, state):
-    """Augments angular state into a non-angular state by replacing theta
+    @classmethod
+    def augment_state(cls, state):
+        """Augments angular state into a non-angular state by replacing theta
         with sin(theta) and cos(theta).
 
         In this case, it converts:
@@ -95,17 +97,17 @@ class InvertedPendulumDynamics(AutoDiffDynamics):
         Returns:
             Augmented state size [state_size].
         """
-    if state.ndim == 1:
-      theta, theta_dot = state
-    else:
-      theta = state[0].reshape(-1, 1)
-      theta_dot = state[1].reshape(-1, 1)
+        if state.ndim == 1:
+            theta, theta_dot = state
+        else:
+            theta = state[0].reshape(-1, 1)
+            theta_dot = state[1].reshape(-1, 1)
 
-    return jnp.hstack([jnp.sin(theta), jnp.cos(theta), theta_dot])
+        return jnp.hstack([jnp.sin(theta), jnp.cos(theta), theta_dot])
 
-  @classmethod
-  def reduce_state(cls, state):
-    """Reduces a non-angular state into an angular state by replacing
+    @classmethod
+    def reduce_state(cls, state):
+        """Reduces a non-angular state into an angular state by replacing
         sin(theta) and cos(theta) with theta.
 
         In this case, it converts:
@@ -118,12 +120,12 @@ class InvertedPendulumDynamics(AutoDiffDynamics):
         Returns:
             Reduced state size [reducted_state_size].
         """
-    if state.ndim == 1:
-      sin_theta, cos_theta, theta_dot = state
-    else:
-      sin_theta = state[0].reshape(-1, 1)
-      cos_theta = state[1].reshape(-1, 1)
-      theta_dot = state[2].reshape(-1, 1)
+        if state.ndim == 1:
+            sin_theta, cos_theta, theta_dot = state
+        else:
+            sin_theta = state[0].reshape(-1, 1)
+            cos_theta = state[1].reshape(-1, 1)
+            theta_dot = state[2].reshape(-1, 1)
 
-    theta = jnp.arctan2(sin_theta, cos_theta)
-    return jnp.hstack([theta, theta_dot])
+        theta = jnp.arctan2(sin_theta, cos_theta)
+        return jnp.hstack([theta, theta_dot])
