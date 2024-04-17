@@ -119,9 +119,8 @@ class iLQR(BaseController):
 
             # Forward rollout only if it needs to be recomputed.
             if changed:
-                us_prime = np.array([u + np.random.uniform(-0.1, 0.1) for u in us])
                 (xs, F_x, F_u, L, L_x, L_u, L_xx, L_ux, L_uu) = self._forward_rollout(
-                    x0, us_prime
+                    x0, us
                 )
                 J_opt = L.sum()
                 changed = False
@@ -199,9 +198,12 @@ class iLQR(BaseController):
         us_new = np.zeros_like(us)
         xs_new[0] = xs[0].copy()
 
+        # Add disturbances to the control path
+        disturbances = np.random.uniform(-0.1, 0.1, us.shape)
+
         for i in range(self.N):
             # Eq (12).
-            us_new[i] = us[i] + alpha * k[i] + K[i].dot(xs_new[i] - xs[i])
+            us_new[i] = us[i] + alpha * k[i] + K[i].dot(xs_new[i] - xs[i]) + disturbances[i]
 
             # Eq (8c).
             xs_new[i + 1] = self.dynamics.f(xs_new[i], us_new[i])
