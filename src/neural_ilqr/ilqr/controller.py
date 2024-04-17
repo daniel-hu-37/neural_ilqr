@@ -167,6 +167,7 @@ class iLQR(BaseController):
           break
 
       if on_iteration:
+        print("ahaha")
         on_iteration(iteration, xs, us, J_opt, accepted, converged)
 
       if converged:
