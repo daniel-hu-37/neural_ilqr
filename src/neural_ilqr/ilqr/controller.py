@@ -115,10 +115,7 @@ class iLQR(BaseController):
         changed = True
         converged = False
         for iteration in range(n_iterations):
-            print(us)
             us = np.array([u + np.random.uniform(-0.1, 0.1) for u in us])
-            print(us)
-            print()
             accepted = False
 
             # Forward rollout only if it needs to be recomputed.
