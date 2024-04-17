@@ -115,13 +115,13 @@ class iLQR(BaseController):
         changed = True
         converged = False
         for iteration in range(n_iterations):
-            # us = np.array([u + np.random.uniform(-0.1, 0.1) for u in us])
             accepted = False
 
             # Forward rollout only if it needs to be recomputed.
             if changed:
+                us_prime = np.array([u + np.random.uniform(-0.1, 0.1) for u in us])
                 (xs, F_x, F_u, L, L_x, L_u, L_xx, L_ux, L_uu) = self._forward_rollout(
-                    x0, us
+                    x0, us_prime
                 )
                 J_opt = L.sum()
                 changed = False
