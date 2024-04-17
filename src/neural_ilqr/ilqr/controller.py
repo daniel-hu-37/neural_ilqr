@@ -115,6 +115,8 @@ class iLQR(BaseController):
         changed = True
         converged = False
         for iteration in range(n_iterations):
+            print(us)
+            print()
             accepted = False
 
             # Forward rollout only if it needs to be recomputed.
@@ -132,8 +134,6 @@ class iLQR(BaseController):
                 # Backtracking line search.
                 for alpha in alphas:
                     xs_new, us_new = self._control(xs, us, k, K, alpha)
-                    print(us_new)
-                    print()
                     J_new = self._trajectory_cost(xs_new, us_new)
 
                     if J_new < J_opt:
