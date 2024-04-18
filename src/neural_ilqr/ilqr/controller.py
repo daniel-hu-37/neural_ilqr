@@ -199,7 +199,8 @@ class iLQR(BaseController):
         xs_new[0] = xs[0].copy()
 
         # Add disturbances to the control path
-        disturbances = np.array([[np.random.choice([-0.1, 0], p=[0.3, 0.7])] for i in range(len(us))])
+        # disturbances = np.array([[np.random.choice([-0.1, 0], p=[0.3, 0.7])] for i in range(len(us))])
+        disturbances = np.zeros_like(us)
 
         for i in range(self.N):
             # Eq (12).
